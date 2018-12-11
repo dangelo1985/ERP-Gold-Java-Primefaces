@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Logradouros</title>
+	<link rel="stylesheet" type="text/css" href="css/estilo.css" />
+</h:head>
+<h:body>
+	<p:growl id="mensagem" />
+
+	<h:form id="formListagem">
+		<p:panel header="Logradouros - Listagem">
+			<p:dataTable id="tabela" emptyMessage="Nenhum registro encontrado."
+				paginator="true" value="#{logradouroBean.logradouros}"
+				var="logradouro" rows="5">
+				<f:facet name="header">
+					<p:commandButton value="Novo"
+						actionListener="#{logradouroBean.novo}"
+						oncomplete="PF('dialogo').show();"
+						update=":mensagem :formCadastro:painel" />
+				</f:facet>
+				<p:column headerText="Código" filterBy="#{logradouro.codigo}"
+					sortBy="#{logradouro.codigo}" width="150">
+					<h:outputText value="#{logradouro.codigo}" />
+				</p:column>
+
+				<p:column headerText="Cep" filterBy="#{logradouro.cep}"
+					sortBy="#{logradouro.cep}" width="150">
+					<h:outputText value="#{logradouro.cep}" />
+				</p:column>
+
+				<p:column headerText="Descrição" sortBy="#{logradouro.descricao}"
+				width="100">
+					<h:outputText value="#{logradouro.descricao}" />
+				</p:column>
+
+				<p:column headerText="Logradouro" filterBy="#{logradouro.rua}"
+					sortBy="#{logradouro.rua}">
+					<h:outputText value="#{logradouro.rua}" />
+				</p:column>
+
+				<p:column headerText="Cidade" filterBy="#{logradouro.cidade.nome}"
+					sortBy="#{logradouro.cidade.nome}" width="150">
+					<h:outputText value="#{logradouro.cidade.nome}" />
+				</p:column>
+
+				<p:column headerText="Estado"
+					filterBy="#{logradouro.cidade.estado.nome}"
+					sortBy="#{logradouro.cidade.estado.nome}" width="150">
+					<h:outputText value="#{logradouro.cidade.estado.nome}" />
+					<h:outputText value=" - " />
+					<h:outputText value="#{logradouro.cidade.estado.sigla}" />
+				</p:column>
+
+
+				<p:column headerText="Opções" width="100">
+					<p:commandButton icon="ui-icon-trash"
+						actionListener="#{logradouroBean.excluir}"
+						update=":mensagem :formListagem:tabela">
+						<p:confirm header="Confirmação" message="Deseja excluir o logradouro"
+							icon="ui-icon-alert" />
+						<f:attribute name="logradouroSelecionado" value="#{logradouro}" />
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-pencil"
+						actionListener="#{logradouroBean.editar}"
+						update=":mensagem :formCadastro:painel"
+						oncomplete="PF('dialogo').show();">
+						<f:attribute name="logradouroSelecionado" value="#{logradouro}" />
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+
+			<p:confirmDialog global="true">
+				<p:commandButton value="Sim" type="button"
+					styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+				<p:commandButton value="Não" type="button"
+					styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+			</p:confirmDialog>
+		</p:panel>
+	</h:form>
+
+	<p:dialog header="Cidades - Cadastro" widgetVar="dialogo"
+		draggable="false" resizable="false" modal="true" closable="false">
+		<h:form id="formCadastro">
+			<h:panelGrid id="painel" columns="2">
+				<p:outputLabel value="Cep:" />
+				<p:inputText maxlength="50" size="20"
+					value="#{logradouroBean.logradouro.cep}" />
+
+				<p:outputLabel value="Descrição:" />
+				<p:selectOneMenu filter="true"
+					value="#{logradouroBean.logradouro.descricao}"
+					converter="omnifaces.SelectItemsConverter">
+					<f:selectItem noSelectionOption="true"
+						itemLabel="Selecione uma descrição" />
+					<f:selectItem itemLabel="Avenida" itemValue="Avenida" />
+					<f:selectItem itemLabel="Alameda" itemValue="Alameda" />
+					<f:selectItem itemLabel="Travessa" itemValue="Travessa" />
+					<f:selectItem itemLabel="Praça" itemValue="Praça" />
+					<f:selectItem itemLabel="Rodovia" itemValue="Rodovia" />
+					<f:selectItem itemLabel="Rua" itemValue="Rua" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Logradouro:" />
+				<p:inputText maxlength="50" size="50"
+					value="#{logradouroBean.logradouro.rua}" />
+
+				<p:outputLabel value="Bairro" />
+				<p:inputText maxlength="50" size="30"
+					value="#{logradouroBean.logradouro.bairro}" />
+
+				<p:outputLabel value="Cidade:" />
+				<p:selectOneMenu filter="true"
+					value="#{logradouroBean.logradouro.cidade}"
+					converter="omnifaces.SelectItemsConverter">
+					<f:selectItem noSelectionOption="true"
+						itemLabel="Selecione uma cidade" />
+					<f:selectItems value="#{logradouroBean.cidades}" var="cidade"
+						itemValue="#{cidade}" itemLabel="#{cidade.nome}" />
+				</p:selectOneMenu>
+			</h:panelGrid>
+
+			<h:panelGrid columns="2">
+				<p:commandButton value="Salvar"
+					actionListener="#{logradouroBean.salvar}"
+					update=":mensagem :formCadastro:painel :formListagem:tabela" />
+				<p:commandButton value="Fechar" oncomplete="PF('dialogo').hide();" />
+			</h:panelGrid>
+		</h:form>
+	</p:dialog>
+</h:body>
+</html>

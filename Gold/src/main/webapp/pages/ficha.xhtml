@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Fichas</title>
+	<link rel="stylesheet" type="text/css" href="css/estilo.css" />
+</h:head>
+<h:body>
+	<p:growl id="mensagem" />
+
+	<h:form id="formListagem">
+		<p:panel header="Fichas - Listagem">
+			<p:dataTable id="tabela" emptyMessage="Nenhum registro encontrado."
+				paginator="true" value="#{fichasBean.fichas}"
+				var="ficha" rows="5">
+				<f:facet name="header">
+					<p:commandButton value="Novo"
+						actionListener="#{fichasBean.novo}"
+						oncomplete="PF('dialogo').show();"
+						update=":mensagem :formCadastro:painel" />
+				</f:facet>
+				<p:column headerText="Código" filterBy="#{ficha.codigo}"
+					sortBy="#{ficha.codigo}" width="150">
+					<h:outputText value="#{ficha.codigo}" />
+				</p:column>
+
+				<p:column headerText="Nome" filterBy="#{ficha.nome}"
+					sortBy="#{ficha.nome}" width="150">
+					<h:outputText value="#{ficha.nome}" />
+				</p:column>
+
+				<p:column headerText="Nome Fantasia" sortBy="#{ficha.nomeFantasia}"
+				width="100">
+					<h:outputText value="#{ficha.nomeFantasia}" />
+				</p:column>
+				
+				<p:column headerText="CPF/CNPJ" sortBy="#{ficha.cpfCnpj}"
+				width="80" filterBy="#{ficha.cpfCnpj}">
+					<h:outputText value="#{ficha.cpfCnpj}" />
+				</p:column>
+
+				<p:column headerText="Logradouro" filterBy="#{ficha.logradouro.rua}"
+					sortBy="#{ficha.logradouro.rua}" width="200">
+					<h:outputText value="#{ficha.logradouro.descricao}" />
+					<h:outputText value=" " />
+					<h:outputText value="#{ficha.logradouro.rua }" />
+					<h:outputText value=" " />
+					<h:outputText value="#{ficha.numero}" />
+					<h:outputText value=" " />
+					<h:outputText value="#{ficha.logradouro.cidade.nome}" />
+					<h:outputText value=" - " />
+					<h:outputText value="#{ficha.logradouro.cidade.estado.sigla}" />
+				</p:column>
+
+				
+				<p:column headerText="Opções" width="100">
+					<p:commandButton icon="ui-icon-trash"
+						actionListener="#{fichasBean.excluir}"
+						update=":mensagem :formListagem:tabela">
+						<p:confirm header="Confirmação" message="Deseja excluir?"
+							icon="ui-icon-alert" />
+						<f:attribute name="fichaSelecionada" value="#{ficha}" />
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-pencil"
+						actionListener="#{fichasBean.editar}"
+						update=":mensagem :formCadastro:painel"
+						oncomplete="PF('dialogo').show();">
+						<f:attribute name="fichaSelecionada" value="#{ficha}" />
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+
+			<p:confirmDialog global="true">
+				<p:commandButton value="Sim" type="button"
+					styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+				<p:commandButton value="Não" type="button"
+					styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+			</p:confirmDialog>
+		</p:panel>
+	</h:form>
+
+	<p:dialog header="Fichas - Cadastro" widgetVar="dialogo"
+		draggable="false" resizable="false" modal="true" closable="false">
+		<h:form id="formCadastro">
+			<h:panelGrid id="painel" columns="2">
+			
+				<p:outputLabel value="Nome" />
+				<p:inputText maxlength="50" size="50"
+					value="#{fichasBean.ficha.nome}" />
+					
+				<p:outputLabel value="Nome fantasia" />
+				<p:inputText maxlength="50" size="20"
+					value="#{fichasBean.ficha.nomeFantasia}" />
+				
+				<p:outputLabel value="CPF/CNPJ" />
+				<p:inputText maxlength="50" size="30"
+					value="#{fichasBean.ficha.cpfCnpj}" />
+				
+				<p:outputLabel value="RG/IE" />
+				<p:inputText maxlength="50" size="30"
+					value="#{fichasBean.ficha.rgIe}" />
+
+				<p:outputLabel for="pessoa" value="Pessoa" />
+				<p:selectOneButton id="pessoa" value="#{fichasBean.ficha.tipo}"
+				converter="omnifaces.SelectItemsConverter">
+					<f:selectItem itemValue="F" itemLabel="Fisíca" />
+					<f:selectItem itemValue="J" itemLabel="Jurídica" />
+				</p:selectOneButton>
+				
+				<p:outputLabel value="Tipo" />
+				<p:selectOneMenu filter="true"
+					value="#{fichasBean.ficha.tipoFicha}"
+					converter="omnifaces.SelectItemsConverter">
+					<f:selectItem noSelectionOption="true"
+						itemLabel="Tipo" />
+					<f:selectItem itemLabel="Cliente" itemValue="cliente" />
+					<f:selectItem itemLabel="Fornecedor" itemValue="fornecedor" />
+					<f:selectItem itemLabel="Transportador" itemValue="transportador" />
+					<f:selectItem itemLabel="Funcionário" itemValue="funcionario" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="logradouro" />
+				<p:selectOneMenu filter="true"
+					value="#{fichasBean.ficha.logradouro}"
+					converter="omnifaces.SelectItemsConverter">
+					<f:selectItem noSelectionOption="true"
+						itemLabel="Selecione uma Rua" />
+					<f:selectItems value="#{fichasBean.logradouros}" var="logradouro"
+						itemValue="#{logradouro}" itemLabel="#{logradouro.cep} - #{logradouro.rua} - #{logradouro.bairro}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Numero" />
+				<p:inputText maxlength="20" size="20"
+					value="#{fichasBean.ficha.numero}" />
+				
+				<p:outputLabel value="Complemento" />
+				<p:inputText maxlength="20" size="20"
+					value="#{fichasBean.ficha.complemento}" />
+				
+				<p:outputLabel value="Telefone" />
+				<p:inputText maxlength="20" size="30"
+					value="#{fichasBean.ficha.telefone}"/>
+				
+				<p:outputLabel value="Email" />
+				<p:inputText maxlength="50" size="50"
+					value="#{fichasBean.ficha.email}" />
+				
+			</h:panelGrid>
+
+			<h:panelGrid columns="2">
+				<p:commandButton value="Salvar"
+					actionListener="#{fichasBean.salvar}"
+					update=":mensagem :formCadastro:painel :formListagem:tabela" />
+				<p:commandButton value="Fechar" oncomplete="PF('dialogo').hide();" />
+			</h:panelGrid>
+		</h:form>
+	</p:dialog>
+</h:body>
+</html>
